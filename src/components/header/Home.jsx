@@ -6,7 +6,7 @@ function Home() {
     <>
       <div className="home-container">
        <div> <h1>Rent the smart way <br/> with Nestaway!</h1></div>
-       <div> <img src={Icon} alt="" /></div>
+       <div> <img src={Icon} alt="Icon" /></div>
       </div>
     </>
   );

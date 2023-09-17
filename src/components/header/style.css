@@ -204,7 +204,7 @@
    flex-direction: row;
    justify-content: space-evenly;
    align-items: center; 
-   margin: 0 auto; 
+   margin: 100px auto auto auto; 
  }
  
  .home-container h1 {

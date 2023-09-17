@@ -1,141 +1,123 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { useDispatch, connect,useSelector } from "react-redux";
-import { bookProperty } from '../../actions/bookingActions';
+import React, { useState, useEffect, useReducer } from 'react';
+import { useParams } from 'react-router-dom';
+import { usePropertyContext } from '../../propertyContext';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import House from '../../assets/guided-tour.png';
 
-import "./style.css";
-import "../propertyList/style.css";
-import House from "../../assets/guided-tour.png";
-
-const mapStateToProps = (state) => {
-  console.log(state.properties)
-
-  return {
-    // properties: state.properties,
-  };
+const initialState = {
+  property: null,
+  formData: { name: '', contact: '', dates: '' },
+  formErrors: { name: '', contact: '', dates: '' },
+  successMessage: '',
+  isDialogOpen: false,
 };
 
-function PropertyDetails() {
-  const { id } = useParams();
-  const [isDialogOpen, setDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    dates: null, // Initialize dates as null
-    contact: "",
-  });
-  const [formErrors, setFormErrors] = useState({});
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [submissionStatus, setSubmissionStatus] = useState({
-    success: false,
-    error: null,
-  });
-
-  const dispatch = useDispatch();
-  const property = useSelector((state) =>
-    state.propertyReducer.properties.find((prop) => prop.id === id)
-  );
-
-  if (!property) {
-    return <p>Property not found</p>;
+const propertyReducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_PROPERTY':
+      return { ...state, property: action.payload };
+    case 'SET_FORM_DATA':
+      return { ...state, formData: { ...state.formData, ...action.payload } };
+    case 'SET_FORM_ERRORS':
+      return { ...state, formErrors: action.payload };
+    case 'SET_SUCCESS_MESSAGE':
+      return { ...state, successMessage: action.payload };
+    case 'OPEN_DIALOG':
+      return { ...state, isDialogOpen: true };
+    case 'CLOSE_DIALOG':
+      return { ...state, isDialogOpen: false };
+    default:
+      return state;
   }
+};
+function PropertyDetails() {
 
-  const containerStyle = {
-    padding: "20px",
-  };
+  const { id } = useParams();
+  const { state, dispatch } = usePropertyContext();
+  const [propertyState, propertyDispatch] = useReducer(
+    propertyReducer,
+    initialState
+  );
+  console.log(propertyState, 'houses')
 
-  const openDialog = () => {
-    setDialogOpen(true);
-  };
-
-  const closeDialog = () => {
-    setDialogOpen(false);
-  };
+  const [selectedDate, setSelectedDate] = useState(null);
+  useEffect(() => {
+    const property = state.properties.find(
+      (property) => property.id === Number(id)
+    );
+    propertyDispatch({ type: 'SET_PROPERTY', payload: property });
+  }, [id, state.properties]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    propertyDispatch({ type: 'SET_FORM_DATA', payload: { [name]: value } });
   };
 
   const validateForm = () => {
     const errors = {};
 
-    if (!formData.name.trim()) {
-      errors.name = "Name is required";
+    if (!propertyState.formData.name.trim()) {
+      errors.name = 'Name is required';
+    }
+    if (!propertyState.formData.contact.trim()) {
+      errors.contact = 'Contact is required';
+    } else if (!/^\d{10}$/.test(propertyState.formData.contact)) {
+      errors.contact = 'Invalid contact format (10 digits)';
     }
 
-    if (!formData.contact.trim()) {
-      errors.contact = "Contact number is required";
-    } else if (!isValidContactNumber(formData.contact)) {
-      errors.contact = "Invalid contact number format";
+    if (!propertyState.formData.dates.trim()) {
+      errors.dates = 'Booking dates are required';
     }
-
-    if (!formData.dates) {
-      errors.dates = "Booking Date is required";
-    }
-
-    setFormErrors(errors);
+    propertyDispatch({ type: 'SET_FORM_ERRORS', payload: errors });
 
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (validateForm()) {
-      // Include the selected date in the formData
-      formData.dates = selectedDate;
-  
-      // Dispatch the bookProperty action with property ID and formData
-     dispatch(bookProperty(property.id, formData))
-       .then(() => {
-         setSubmissionStatus({
-           success: true,
-           error: null,
-         });
-         setTimeout(() => {
-           closeDialog();
-         }, 2000);
-       })
-       .catch((error) => {
-         setSubmissionStatus({
-           success: false,
-           error: "Booking failed. Please try again later.",
-         });
-       });
+      dispatch({
+        type: 'BOOK_PROPERTY',
+        payload: {
+          id: propertyState.property.id,
+          bookingData: propertyState.formData,
+        },
+      });
+
+      propertyDispatch({ type: 'SET_SUCCESS_MESSAGE', payload: 'Booking successful!' });
+      propertyDispatch({ type: 'CLOSE_DIALOG' });
     }
   };
-  
 
-  const isValidContactNumber = (contact) => {
-    const contactRegex = /^\d{10}$/;
-    return contactRegex.test(contact);
+  const openDialog = () => {
+    propertyDispatch({ type: 'OPEN_DIALOG' });
+  };
+
+  const closeDialog = () => {
+    propertyDispatch({ type: 'CLOSE_DIALOG' });
   };
 
   return (
     <>
       <div className="centered-container">
-        <div style={containerStyle} className="property_details">
+        <div className="property_details">
           <h2>Property Details</h2>
 
-          <p style={{ paddingTop: "15px" }}>
-            <span>Description:</span>{" "}
-            {property.description.short_description || "-"}
+          <p style={{ paddingTop: '15px' }}>
+            <span>Description:</span> {propertyState.property?.houses.description.short_description || '-'}
           </p>
-          <p style={{ paddingTop: "15px" }}>
+          <p style={{ paddingTop: '15px' }}>
             <span>Amenities: </span>
-            {property.amenity_list.length > 0
-              ? property.amenity_list[0].amenity
-              : "-"}
+            {propertyState.property?.amenity_list.length > 0
+              ? propertyState.property?.amenity_list[0].amenity
+              : '-'}
           </p>
           <div className="amtImg">
-            {property.amenity_list.length > 0 && (
+            {propertyState.property?.amenity_list.length > 0 && (
               <img
-                src={property.amenity_list[0].icon_url}
+                src={propertyState.property?.amenity_list[0].icon_url}
                 className=""
                 alt=""
               />
@@ -144,37 +126,34 @@ function PropertyDetails() {
           <div className="ametitiesDetails">
             <div className="amtfirst">
               <p>
-                <span>Available from:</span> {property.available_from || "-"}
+                <span>Available from:</span> {propertyState.property?.available_from || '-'}
               </p>
               <p>
-                <span>Furnishing Type:</span>{" "}
-                {property.furnishing_type || "-"}
+                <span>Furnishing Type:</span> {propertyState.property?.furnishing_type || '-'}
               </p>
               <p>
-                <span>Gender:</span> {property.gender || "-"}
+                <span>Gender:</span> {propertyState.property?.gender || '-'}
               </p>
             </div>
             <div className="amtTwo">
               <p>
-                <span>House Type:</span> {property.house_type || "-"}
+                <span>House Type:</span> {propertyState.property?.house_type || '-'}
               </p>
               <p>
-                <span>BHK:</span> {property.bhk_details || "-"}
+                <span>BHK:</span> {propertyState.property?.bhk_details || '-'}
               </p>
               <p>
-                <span>Sharing:</span> {property.shared || "-"}
+                <span>Sharing:</span> {propertyState.property?.shared || '-'}
               </p>
             </div>
           </div>
 
           <div className="descriptionDetails">
             <p>
-              <span>Pg:</span>{" "}
-              {property.mdescription ? property.mdescriptions.pg : "-"}
+              <span>Pg:</span> {propertyState.property?.mdescription ? propertyState.property?.mdescriptions.pg : '-'}
             </p>
             <p>
-              <span>House:</span>{" "}
-              {property.mdescription ? property.mdescriptions.house : "-"}
+              <span>House:</span> {propertyState.property?.mdescription ? propertyState.property?.mdescriptions.house : '-'}
             </p>
           </div>
         </div>
@@ -191,7 +170,25 @@ function PropertyDetails() {
         </div>
       </div>
 
-      {isDialogOpen && (
+      {propertyState.property && (
+        <div>
+          <h3>{propertyState.property.title}</h3>
+          {propertyState.property.booked ? (
+            <p>This property is already booked.</p>
+          ) : (
+            <div>
+              {propertyState.successMessage && (
+                <p className="success">{propertyState.successMessage}</p>
+              )}
+              <button className="btn first" onClick={openDialog}>
+                Book Now
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {propertyState.isDialogOpen && (
         <div className="dialog-overlay">
           <div className="dialog-box">
             <span className="close-button" onClick={closeDialog}>
@@ -205,11 +202,11 @@ function PropertyDetails() {
                   type="text"
                   id="name"
                   name="name"
-                  value={formData.name}
+                  value={propertyState.formData.name}
                   onChange={handleInputChange}
                 />
-                {formErrors.name && (
-                  <div className="error">{formErrors.name}</div>
+                {propertyState.formErrors.name && (
+                  <div className="error">{propertyState.formErrors.name}</div>
                 )}
               </div>
               <div className="form-group">
@@ -218,11 +215,11 @@ function PropertyDetails() {
                   type="number"
                   id="contact"
                   name="contact"
-                  value={formData.contact}
+                  value={propertyState.formData.contact}
                   onChange={handleInputChange}
                 />
-                {formErrors.contact && (
-                  <div className="error">{formErrors.contact}</div>
+                {propertyState.formErrors.contact && (
+                  <div className="error">{propertyState.formErrors.contact}</div>
                 )}
               </div>
               <div className="form-group">
@@ -234,8 +231,8 @@ function PropertyDetails() {
                   dateFormat="dd/MM/yyyy"
                   isClearable
                 />
-                {formErrors.dates && (
-                  <div className="error">{formErrors.dates}</div>
+                {propertyState.formErrors.dates && (
+                  <div className="error">{propertyState.formErrors.dates}</div>
                 )}
               </div>
               <div className="btnDetails">
@@ -247,15 +244,7 @@ function PropertyDetails() {
           </div>
         </div>
       )}
-      {submissionStatus.success && (
-        <div className="success-message">Booking successful!</div>
-      )}
-
-      {submissionStatus.error && (
-        <div className="error-message">{submissionStatus.error}</div>
-      )}
     </>
   );
 }
-
-export default connect(mapStateToProps)(PropertyDetails);
+export default PropertyDetails;

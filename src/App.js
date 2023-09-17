@@ -1,30 +1,25 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import PropertyList from './components/propertyList/PropertyList';
-import PropertyDetails from './components/propertyDetails/PropertyDetails';
+import PropertyList from '../src/components/propertyList/PropertyList';
+import PropertyDetails from '../src/components/propertyDetails/PropertyDetails';
+import { PropertyProvider } from '../src/propertyContext';
+import Header from '../src/components/header/Header';
 import './App.css';
-import Header from './components/header/Header';
-import { useDispatch } from 'react-redux';
-import { fetchProperties } from './actions/bookingActions';
+import '../src/components/propertyDetails/style.css';
+import '../src/components/propertyList/style.css';
+import '../src/components/header/style.css';
 
 function App() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    console.log( 'app')
-    dispatch(fetchProperties());
-  }, [dispatch]);
-
   return (
-    <BrowserRouter>
-      <Header className="header" />
-      <div className="main-content">
+    <PropertyProvider>
+      <BrowserRouter>
+      <Header/>
         <Routes>
           <Route path="/" element={<PropertyList />} />
           <Route path="/property-details/:id" element={<PropertyDetails />} />
         </Routes>
-      </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </PropertyProvider>
   );
 }
 
