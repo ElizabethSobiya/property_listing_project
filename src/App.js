@@ -1,24 +1,30 @@
-import logo from './logo.svg';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import PropertyList from './components/propertyList/PropertyList';
+import PropertyDetails from './components/propertyDetails/PropertyDetails';
 import './App.css';
+import Header from './components/header/Header';
+import { useDispatch } from 'react-redux';
+import { fetchProperties } from './actions/bookingActions';
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log( 'app')
+    dispatch(fetchProperties());
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Header className="header" />
+      <div className="main-content">
+        <Routes>
+          <Route path="/" element={<PropertyList />} />
+          <Route path="/property-details/:id" element={<PropertyDetails />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
