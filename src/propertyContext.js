@@ -1,5 +1,3 @@
-// PropertyContext.js
-
 import React, { createContext, useReducer, useContext } from 'react';
 
 const PropertyContext = createContext();

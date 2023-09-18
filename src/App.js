@@ -8,6 +8,7 @@ import './App.css';
 import '../src/components/propertyDetails/style.css';
 import '../src/components/propertyList/style.css';
 import '../src/components/header/style.css';
+import Footer from './components/footer/Footer';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<PropertyList />} />
           <Route path="/property-details/:id" element={<PropertyDetails />} />
         </Routes>
+        <Footer/>
       </BrowserRouter>
     </PropertyProvider>
   );

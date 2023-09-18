@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import "./style.css";
 import Home from "../header/Home";
@@ -11,7 +11,7 @@ function PropertyList() {
     navigate(`/property-details/${property.nestaway_id}`);
   };
 
-  const { state, dispatch } = usePropertyContext();
+  const { state } = usePropertyContext();
 
   const propertyReducer = (state, action) => {
     switch (action.type) {
@@ -51,21 +51,26 @@ function PropertyList() {
       });
   }, []);
 
+  useEffect(() => {
+    // Update propertyState.properties when state.properties changes
+    propertyDispatch({ type: "FETCH_PROPERTIES", payload: state });
+  }, [state]);
+
   return (
     <>
       <Home />
-      <div className="property-list">
+      <div className="property-list"  style={{marginBottom:'100px'}} data-testid="property-list">
         {Array.isArray(propertyState.properties) &&
         propertyState.properties.length > 0 ? (
           propertyState.properties.map((property) => (
             <div key={property.nestaway_id} className="property-card">
               <img
                 src={property.image_url}
-                style={{ minHeight: "280px" }}
+                style={{ minHeight: "260px" }}
                 alt={property.title}
               />
               <h2 style={{ paddingTop: "1rem" }}>{property.house_type}</h2>
-              <h2>{property.nestaway_id}</h2>
+              <h2  style={{ paddingTop: "0.5rem" }}>{property.nestaway_id}</h2>
               <p>Location: {property.locality.toUpperCase()}</p>
               <p>Rent: {property.rent}</p>
               {property.booked ? (
@@ -81,7 +86,6 @@ function PropertyList() {
                 </div>
               )}
             </div>
-            
           ))
         ) : (
           <p>No properties available</p>

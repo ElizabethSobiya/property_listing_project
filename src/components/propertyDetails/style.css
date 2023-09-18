@@ -12,6 +12,7 @@
 .property_details {
   margin-top: 150px;
   padding-left: 50px;
+  justify-content: center;
   font-size: 1.2rem;
   /* position: relative;
     z-index: -1;
@@ -217,26 +218,58 @@ input {
 
 @media (max-width: 768px) {
   .book-container-whole {
-    margin-right: 25px;
+    margin-right: 30px;
+    margin-left: 30px;
     flex-direction: column;
-    height: 450px; /* Stacking child divs vertically on smaller screens */
-    align-items: center; /* Center align items horizontally on smaller screens */
-    padding: 20px; /* Add padding to create space around the content */
-    text-align: center; /* Center-align text content */
-    border: 1px solid #ccc; /* Add a border for visual separation */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a subtle shadow effect */
+    height: 450px; 
+    align-items: center; 
+    padding: 10px; 
+    text-align: center; 
+    border: 1px solid #ccc; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 80vw;
   }
   .book-container-whole img {
     margin-left: 10px;
-    width: 45px;
+    width: 60px;
+  }
+  .property_details{
+    padding-left: 20px;
+    justify-content: center;
+    width: 85vw;
+  }
+  .centered-container{
+    display: flex;
+    flex-direction: column;
+  }
+  .ametitiesDetails{
+    font-size: 16px;
+    line-height: 1.5rem;
   }
 }
-@media (min-width: 768px) and (max-width: 1050px) {
+@media (min-width: 768px) and (max-width: 1120px) {
   .book-container-whole {
+    width: 80vw;
     flex-direction: column;
-    height: 500px;
+    /* height: 500px; */
   }
   .book-container-whole img {
     width: 95px;
   }
+  .property_details{
+    width: 85vw;
+    padding-left: 50px;
+    justify-content: center;
+  }
+  .ametitiesDetails{
+    font-size: 20px;
+    line-height: 1.5rem;
+  }
+  .centered-container{
+    display: flex;
+    flex-direction: column;
+  }
+}
+.booked{
+  color: crimson;
 }
