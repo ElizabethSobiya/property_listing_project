@@ -25,7 +25,7 @@ To install this project, follow these steps:
 1. Clone the repository to your local machine:
 
    ```bash
-   git clone https://github.com/your-username/property-listing-app.git
+   git clone https://github.com/ElizabethSobiya/property_listing_project.git
    ```
 
 1. Navigate to the project's root directory:
