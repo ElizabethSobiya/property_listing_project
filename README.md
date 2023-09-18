@@ -30,7 +30,7 @@ To install this project, follow these steps:
 
 1. Navigate to the project's root directory:
    cd property-listing-app
-   2.Install the project's dependencies:
+2.Install the project's dependencies:
    npm install
 
 Usage
@@ -41,12 +41,16 @@ This will start a development server, and you can access the application in your
 
 The application consists of two main pages:
 
-PropertyList: Lists available properties.
-PropertyDetails: Displays details of a selected property.
+###PropertyList: 
+Lists available properties.
+
+###PropertyDetails: 
+Displays details of a selected property.
+
 Navigation
 To view the list of available properties, go to http://localhost:3000.
 To view the details of a property, click the "View Details" button on the PropertyList page.
-Property Booking
+###Property Booking
 On the PropertyDetails page, you can book a property by filling out the booking form and clicking "Submit." If successful, you will see a success message.
 
 Testing
