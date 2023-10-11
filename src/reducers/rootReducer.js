@@ -5,7 +5,7 @@ import bookingReducer from "./bookingReducer";
 
 const rootReducer = combineReducers({
   properties: propertyReducer,
-  // booking: bookingReducer,
+  booking: bookingReducer,
 });
 
 export default rootReducer;
